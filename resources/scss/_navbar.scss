@@ -1,0 +1,19 @@
+// Navbar
+
+$navbar-color: #0d6efd;
+$navbar-text-color: #FFFFFFFF;
+
+.navbar {
+    background-color: $navbar-color;
+    color: $navbar-text-color !important;
+
+    .navbar-brand,
+    .nav-link,
+    .nav-link.active {
+        color: $navbar-text-color;
+        transition: all 0.2s;
+        &:hover {
+            color: rgba($navbar-text-color, 0.8);
+        }
+    }
+}

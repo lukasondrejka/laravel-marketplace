@@ -1,0 +1,31 @@
+// Layout
+
+$background-color: #fcfcfc;
+
+html,
+body {
+    background-color: $background-color;
+    height: 100%;
+    margin: 0;
+}
+
+footer {
+    height: 80px;
+}
+
+.item-img {
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.1)
+}
+
+.item-title {
+    &,
+    &:hover {
+        text-decoration: none;
+        color: rgba(0, 0, 0, 0.85);
+    }
+
+    &:hover {
+        opacity: 0.75;
+    }
+}
