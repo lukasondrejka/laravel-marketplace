@@ -1,5 +1,5 @@
-import {Container, Nav, NavDropdown, Navbar as BootstrapNavbar} from "react-bootstrap";
-import {Link} from "@inertiajs/react";
+import { Container, Nav, NavDropdown, Navbar as BootstrapNavbar } from "react-bootstrap";
+import { Link } from "@inertiajs/react";
 
 export default function Navbar({ user=null }) {
     return (
@@ -17,15 +17,14 @@ export default function Navbar({ user=null }) {
                     </Nav>
                     <Nav>
                         {user ? (
-                            <NavDropdown title={user.name} id="basic-nav-dropdown">
-                                <NavDropdown.Item as={Link} href={route('profile.edit')}>
+                            <>
+                                <Nav.Link as={Link} href={route('profile.edit')}>
                                     Profile
-                                </NavDropdown.Item>
-                                <NavDropdown.Item as={Link} href={route('logout')} method="post">
+                                </Nav.Link>
+                                <Nav.Link as={Link} href={route('logout')} method="post">
                                     Log Out
-                                </NavDropdown.Item>
-
-                            </NavDropdown>
+                                </Nav.Link>
+                            </>
                         ) : (
                             <>
                                 <Nav.Link as={Link} href={route('login')}>
