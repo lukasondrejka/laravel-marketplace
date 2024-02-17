@@ -6,9 +6,6 @@
 
         <title inertia>{{ config('app.name', 'App') }}</title>
 
-        <!-- Styles -->
-        @vite(['resources/scss/app.scss'])
-
         <!-- Scripts -->
         @routes
         @viteReactRefresh
