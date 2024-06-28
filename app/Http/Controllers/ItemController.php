@@ -12,6 +12,11 @@ use Inertia\Inertia;
 class ItemController extends Controller
 {
     /**
+     * Number of items per page.
+     */
+    private const ITEMS_PER_PAGE = 10;
+
+    /**
      * Display items.
      */
     public function index(Request $request)
@@ -37,7 +42,8 @@ class ItemController extends Controller
             ->when($request->category_id, fn ($query, $category_id) => $query->where('category_id', $category_id))
             ->when($request->price_min, fn ($query, $price_min) => $query->where('price', '>=', $price_min))
             ->when($request->price_max, fn ($query, $price_max) => $query->where('price', '<=', $price_max))
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(self::ITEMS_PER_PAGE);
 
         return Inertia::render('Items/Index', [
             'items' => $items,
@@ -65,6 +71,8 @@ class ItemController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
+        ], [], [
+            'category_id' => 'category',
         ]);
 
         $item = Auth::user()->items()->create($request->all());
@@ -76,10 +84,10 @@ class ItemController extends Controller
     /**
      * Display item with the specified id.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
         return Inertia::render('Items/Item', [
-            'item' => Item::with('category')->find($id),
+            'item' => Item::with('category')->find($id)->append('rich_text_description'),
         ]);
     }
 
@@ -106,6 +114,8 @@ class ItemController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
+        ], [], [
+            'category_id' => 'category',
         ]);
 
         $item = Auth::user()->items()->findOrFail($id);

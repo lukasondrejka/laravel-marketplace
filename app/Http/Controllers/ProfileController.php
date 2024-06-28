@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,24 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    /**
+     * Display the user's profile.
+     */
+    public function show(string $id): Response
+    {
+        return Inertia::render('Profile/Profile', [
+            'user' => User::findOrFail($id)->load('items'),
+        ]);
+    }
+
+    /**
+     * Display the current user's profile.
+     */
+    public function showCurrent(Request $request): Response
+    {
+        return $this->show($request->user()->id);
+    }
+
     /**
      * Display the user's profile form.
      */

@@ -19,19 +19,15 @@ use Inertia\Inertia;
 */
 
 // Homepage
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// Dashboard
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
 
 // Item
 Route::get('/items', [ItemController::class, 'index'])
     ->name('items.items');
 
-Route::middleware([Authenticate::class])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/item/create', [ItemController::class, 'create'])
         ->name('items.create');
 
@@ -51,12 +47,20 @@ Route::middleware([Authenticate::class])->group(function () {
 Route::get('item/{id}', [ItemController::class, 'show'])
     ->name('items.show');
 
-
 // User
+Route::get('/user/{id}', [ProfileController::class, 'show'])
+    ->name('profile.show');
+
+// User Profile
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
 // Auth

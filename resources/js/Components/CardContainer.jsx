@@ -1,10 +1,11 @@
 import React from 'react';
 import {Card, Container} from 'react-bootstrap';
 
-export default function CardContainer({ children }) {
+export default function CardContainer({ children, header }) {
     return (
         <Container>
-            <Card className="mb-3 mt-4">
+            <Card className="my-4 p-4">
+                {header && <h1>{header}</h1>}
                 {children}
             </Card>
         </Container>

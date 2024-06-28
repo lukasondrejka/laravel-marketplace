@@ -10,6 +10,7 @@ export default function Home({ auth }) {
 
         get(route('items.items'));
     };
+
     return (
         <Layout
             user={auth.user}

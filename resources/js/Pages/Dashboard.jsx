@@ -1,6 +1,6 @@
 import Layout from '@/Layouts/Layout.jsx';
 import { Head } from '@inertiajs/react';
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 export default function Dashboard({ auth }) {
     return (

@@ -3,34 +3,36 @@ import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import { Head } from '@inertiajs/react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
 
 export default function Edit({ auth, mustVerifyEmail, status }) {
     return (
-        <Layout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Profile</h2>}
-        >
+        <Layout user={auth.user}>
             <Head title="Profile" />
-
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="max-w-xl"
-                        />
-                    </div>
-
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <UpdatePasswordForm className="max-w-xl" />
-                    </div>
-
-                    <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                        <DeleteUserForm className="max-w-xl" />
-                    </div>
-                </div>
-            </div>
+            <Container className="py-12">
+                <Row className="justify-content-center">
+                    <Col lg={8}>
+                        <Card className="p-4 my-4">
+                            <Card.Body>
+                                <UpdateProfileInformationForm
+                                    mustVerifyEmail={mustVerifyEmail}
+                                    status={status}
+                                />
+                            </Card.Body>
+                        </Card>
+                        <Card className="p-4 mb-4">
+                            <Card.Body>
+                                <UpdatePasswordForm />
+                            </Card.Body>
+                        </Card>
+                        <Card className="p-4 mb-4">
+                            <Card.Body>
+                                <DeleteUserForm />
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         </Layout>
     );
 }

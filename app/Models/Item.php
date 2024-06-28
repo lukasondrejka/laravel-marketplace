@@ -11,6 +11,11 @@ class Item extends Model
     use HasFactory;
 
     /**
+     * Maximum length of the teaser.
+     */
+    private const TEASER_LENGTH = 400;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -40,9 +45,8 @@ class Item extends Model
      */
     protected function teaser(): Attribute
     {
-        $length = 100;
-        $value = strlen($this->description) > $length
-            ? substr($this->description, 0, $length) . '…'
+        $value = strlen($this->description) > self::TEASER_LENGTH
+            ? substr($this->description, 0, self::TEASER_LENGTH) . '…'
             : $this->description;
 
         return new Attribute(get: fn () => $value);

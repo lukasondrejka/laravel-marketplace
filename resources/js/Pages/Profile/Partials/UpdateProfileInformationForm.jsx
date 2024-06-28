@@ -1,8 +1,5 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { Button, Form } from 'react-bootstrap';
 import { Transition } from '@headlessui/react';
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status, className = '' }) {
@@ -15,52 +12,41 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
 
     const submit = (e) => {
         e.preventDefault();
-
         patch(route('profile.update'));
     };
 
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
-                </p>
+                <h2 className="text-lg font-medium text-gray-900">Profile</h2>
             </header>
-
-            <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
+            <Form onSubmit={submit} className="mt-6 space-y-6">
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="name">Name</Form.Label>
+                    <Form.Control
                         id="name"
-                        className="mt-1 block w-full"
+                        className="mt-1"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         required
-                        isFocused
                         autoComplete="name"
                     />
+                    {errors.name && <p className="text-danger">{errors.name}</p>}
+                </Form.Group>
 
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="email">Email</Form.Label>
+                    <Form.Control
                         id="email"
                         type="email"
-                        className="mt-1 block w-full"
+                        className="mt-1"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         required
                         autoComplete="username"
                     />
-
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
+                    {errors.email && <p className="text-danger">{errors.email}</p>}
+                </Form.Group>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>
@@ -84,8 +70,10 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                     </div>
                 )}
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                <div className="d-flex align-items-center gap-4">
+                    <Button variant="primary" type="submit" disabled={processing}>
+                        Save
+                    </Button>
 
                     <Transition
                         show={recentlySuccessful}
@@ -97,7 +85,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         <p className="text-sm text-gray-600">Saved.</p>
                     </Transition>
                 </div>
-            </form>
+            </Form>
         </section>
     );
 }

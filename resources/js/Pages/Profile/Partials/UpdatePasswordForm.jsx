@@ -1,10 +1,6 @@
 import { useRef } from 'react';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import { Button, Form } from 'react-bootstrap';
 import { useForm } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
 
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
@@ -39,75 +35,54 @@ export default function UpdatePasswordForm({ className = '' }) {
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">Update Password</h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay secure.
-                </p>
+                <h2 className="text-lg font-medium text-gray-900">Password</h2>
             </header>
-
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="current_password" value="Current Password" />
-
-                    <TextInput
+            <Form onSubmit={updatePassword} className="mt-6">
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="current_password">Current Password</Form.Label>
+                    <Form.Control
+                        className={errors.current_password ? 'is-invalid' : ''}
                         id="current_password"
                         ref={currentPasswordInput}
                         value={data.current_password}
                         onChange={(e) => setData('current_password', e.target.value)}
                         type="password"
-                        className="mt-1 block w-full"
                         autoComplete="current-password"
                     />
-
-                    <InputError message={errors.current_password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
-
-                    <TextInput
+                    {errors.current_password && <p className="text-danger">{errors.current_password}</p>}
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="password">New Password</Form.Label>
+                    <Form.Control
+                        className={errors.password ? 'is-invalid' : ''}
                         id="password"
                         ref={passwordInput}
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         type="password"
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
                     />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
+                    {errors.password && <p className="text-danger">{errors.password}</p>}
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label htmlFor="password_confirmation">Confirm Password</Form.Label>
+                    <Form.Control
+                        className={errors.password_confirmation ? 'is-invalid' : ''}
                         id="password_confirmation"
                         value={data.password_confirmation}
                         onChange={(e) => setData('password_confirmation', e.target.value)}
                         type="password"
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
                     />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
+                    {errors.password_confirmation && <p className="text-danger">{errors.password_confirmation}</p>}
+                </Form.Group>
+                <div className="d-flex align-items-center gap-4">
+                    <Button variant="primary" type="submit" disabled={processing}>
+                        Save
+                    </Button>
+                    {recentlySuccessful && <p className="text-sm text-gray-600">Saved.</p>}
                 </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">Saved.</p>
-                    </Transition>
-                </div>
-            </form>
+            </Form>
         </section>
     );
 }

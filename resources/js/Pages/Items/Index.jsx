@@ -1,15 +1,19 @@
-import {Head, router} from '@inertiajs/react';
-import {Alert, Button, Col, Container, Form, Nav, Row} from 'react-bootstrap';
+import {Head, Link, usePage} from '@inertiajs/react';
+import {Alert, Col, Container, Row} from 'react-bootstrap';
 import Layout from "@/Layouts/Layout.jsx";
-import ItemCard from "@/Components/ItemCard.jsx";
+import ItemCard from "@/Pages/Items/Partials/ItemCard.jsx";
 import Sidebar from "@/Pages/Items/Partials/Sidebar.jsx";
+import Pagination from 'react-bootstrap/Pagination';
 
 export default function Index({ auth, items, categories }) {
+    const {items: itemsPage} = usePage().props;
+
+    console.log(itemsPage)
     return (
         <Layout
             user={auth.user}
         >
-            <Head title="Marketplace"/>
+            <Head title="Items"/>
 
             <Container>
                 <Row className="z-1">
@@ -20,15 +24,21 @@ export default function Index({ auth, items, categories }) {
                     </Col>
 
                     <Col lg={9} className="mt-4">
-                        {items.length === 0 && (
+                        {itemsPage.data.length === 0 ? (
                             <Alert variant="danger" className="">
-                                No items found
+                                No items found :(
                             </Alert>
-                        )}
-
-                        {items.map(item => (
+                        ) : itemsPage.data.map(item => (
                             <ItemCard key={item.id} item={item} />
                         ))}
+
+                        <Pagination className="justify-content-center">
+                            {itemsPage.links.map((link, index) => (
+                                <Pagination.Item key={index}  href={link.url} active={link.active} as={Link}>
+                                    {link.label}
+                                </Pagination.Item>
+                            ))}
+                        </Pagination>
                     </Col>
                 </Row>
             </Container>

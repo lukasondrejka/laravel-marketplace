@@ -1,7 +1,13 @@
-import { Container, Nav, NavDropdown, Navbar as BootstrapNavbar } from "react-bootstrap";
-import { Link } from "@inertiajs/react";
+import { Container, Nav, Navbar as BootstrapNavbar } from "react-bootstrap";
+import {Link, useForm} from "@inertiajs/react";
 
 export default function Navbar({ user=null }) {
+    const { post } = useForm({});
+
+    function logout() {
+        post(route('logout'));
+    }
+
     return (
         <BootstrapNavbar variant="light" sticky="top" expand="md" border="bottom">
             <Container>
@@ -11,17 +17,17 @@ export default function Navbar({ user=null }) {
                 <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" />
                 <BootstrapNavbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link as={Link} href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </Nav.Link>
+                        {/*<Nav.Link as={Link} href={route('dashboard')} active={route().current('dashboard')}>*/}
+                        {/*    Dashboard*/}
+                        {/*</Nav.Link>*/}
                     </Nav>
                     <Nav>
                         {user ? (
                             <>
-                                <Nav.Link as={Link} href={route('profile.edit')}>
+                                <Nav.Link as={Link} href={route('profile.show', user.id)}>
                                     Profile
                                 </Nav.Link>
-                                <Nav.Link as={Link} href={route('logout')} method="post">
+                                <Nav.Link onClick={logout}>
                                     Log Out
                                 </Nav.Link>
                             </>
