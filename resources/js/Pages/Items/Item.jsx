@@ -2,9 +2,9 @@ import {Head, router, useForm} from '@inertiajs/react';
 import {Alert, Button, Card, Col, Container, Form, Modal, Nav, Row} from 'react-bootstrap';
 import Layout from "@/Layouts/Layout.jsx";
 import {useState} from "react";
-import ItemCard from "@/Pages/Items/Partials/ItemCard.jsx";
 import CardContainer from "@/Components/CardContainer.jsx";
 import {formatDate} from "@/utils.js";
+import UserCard from "@/Pages/Profile/Partials/UserCard.jsx";
 
 export default function Item({ auth, item }) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -25,12 +25,16 @@ export default function Item({ auth, item }) {
 
             <CardContainer header={item.title}>
                 <p className="card-text">
-                    <small className="text-muted">{formatDate(item.created_at)} · {item.category.name}</small>
+                    <small className="text-muted">
+                        Created at {formatDate(item.created_at)}
+                        {item.created_at !== item.updated_at && (<><span> · </span>  Updated at {formatDate(item.updated_at)}</>)}
+                        <span> · </span> {item.category.name}
+                    </small>
                 </p>
 
                 <div dangerouslySetInnerHTML={{__html: item.rich_text_description}}></div>
 
-                <div className="clearfix px-4">
+                <div className="clearfix mt-3">
                     <div className="float-end">
                         <h3>{item.price} €</h3>
                     </div>
@@ -63,6 +67,8 @@ export default function Item({ auth, item }) {
                     </Modal.Footer>
                 </Modal>
             </CardContainer>
+
+            <UserCard user={item.user} auth={auth} />
         </Layout>
     );
 }

@@ -59,7 +59,7 @@ export default function Item({ auth, item = {}, categories }) {
                         {errors.price && <Form.Control.Feedback type="invalid">{errors.price}</Form.Control.Feedback>}
                     </Form.Group>
 
-                    <Button variant="primary" type="submit">Submit</Button>
+                    <Button variant="primary" type="submit">Save</Button>
                 </Form>
             </CardContainer>
         </Layout>

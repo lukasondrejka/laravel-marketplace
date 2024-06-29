@@ -20,7 +20,7 @@ class ProfileController extends Controller
     public function show(string $id): Response
     {
         return Inertia::render('Profile/Profile', [
-            'user' => User::findOrFail($id)->load('items'),
+            'user' => User::with('items.category')->withCount('items')->findOrFail($id),
         ]);
     }
 

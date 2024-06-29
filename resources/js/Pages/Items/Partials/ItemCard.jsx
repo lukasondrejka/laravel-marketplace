@@ -5,8 +5,8 @@ import {formatDate} from "@/utils.js";
 
 const ItemCard = ({ item }) => {
     return (
-        <CardContainer>
-            <Card.Body className="pl-0 p-4">
+        <Card className="my-4 p-4">
+            <Card.Body>
                 <a href={route('items.show', item.id)} className="item-title">
                     <Card.Title>{item.title}</Card.Title>
                 </a>
@@ -17,12 +17,12 @@ const ItemCard = ({ item }) => {
                 </Card.Text>
                 <Card.Text>{item.teaser}</Card.Text>
             </Card.Body>
-            <div className="clearfix pt-2">
+            <div className="clearfix pt-2 pr-4">
                 <div className="float-end">
                     <h5>{item.price} €</h5>
                 </div>
             </div>
-        </CardContainer>
+        </Card>
     );
 };
 

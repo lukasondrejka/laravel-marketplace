@@ -21,7 +21,7 @@ export default function Home({ auth }) {
                 <Container>
                     <Row className="justify-content-center my-4">
                         <Col lg={6} md={9}>
-                            <Form.Control type="text" size="lg" onChange={e => setData('search', e.target.value)} />
+                            <Form.Control type="text" size="lg" onChange={e => setData('search', e.target.value)} autoFocus />
                         </Col>
                         <Col lg={2} md={3} className="mt-4 mt-md-0">
                             <Button variant="primary" size="lg" block type="submit">Search</Button>

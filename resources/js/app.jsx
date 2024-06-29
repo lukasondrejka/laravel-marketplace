@@ -7,7 +7,7 @@ import './bootstrap';
 const appName = import.meta.env.VITE_APP_NAME || 'Marketplace';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => title ? `${title} - ${appName}` : appName,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.jsx`, import.meta.glob('./Pages/**/*.jsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
@@ -17,4 +17,4 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
-});
+}).then(() => document.getElementById('app').removeAttribute('data-page'))

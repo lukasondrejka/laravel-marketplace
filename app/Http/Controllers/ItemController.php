@@ -87,7 +87,7 @@ class ItemController extends Controller
     public function show(int $id)
     {
         return Inertia::render('Items/Item', [
-            'item' => Item::with('category')->find($id)->append('rich_text_description'),
+            'item' => Item::with(['category', 'user.items'])->find($id)->append('rich_text_description'),
         ]);
     }
 

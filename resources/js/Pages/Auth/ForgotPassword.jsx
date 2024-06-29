@@ -1,7 +1,6 @@
+import { useState } from 'react';
 import Layout from '@/Layouts/Layout';
-import InputError from '@/Components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import { Form, Button, Container, Row, Col, Alert, Card } from 'react-bootstrap';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
@@ -19,32 +18,41 @@ export default function ForgotPassword({ status }) {
         <Layout>
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                Forgot your password? No problem. Just let us know your email address and we will email you a password
-                reset link that will allow you to choose a new one.
-            </div>
+            <Container className="my-5">
+                <Row className="justify-content-md-center">
+                    <Col lg="5" md="8">
+                        <Card>
+                            <Card.Body className="m-2">
+                                <Card.Title><h2 className="text-center">Forgot Password</h2></Card.Title>
+                                <div className="mb-4 text-sm text-gray-600">
+                                    Enter your email address and we will send you a password reset link.
+                                </div>
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
+                                {status && <Alert variant="success" className="mb-4">{status}</Alert>}
 
-            <form onSubmit={submit}>
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
-                    onChange={(e) => setData('email', e.target.value)}
-                />
+                                <Form onSubmit={submit}>
+                                    <Form.Group controlId="email" className="my-4">
+                                        <Form.Label>Email</Form.Label>
+                                        <Form.Control
+                                            type="email"
+                                            value={data.email}
+                                            autoComplete="username"
+                                            onChange={(e) => setData('email', e.target.value)}
+                                        />
+                                        {errors.email && <Form.Text className="text-danger">{errors.email}</Form.Text>}
+                                    </Form.Group>
 
-                <InputError message={errors.email} className="mt-2" />
-
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Email Password Reset Link
-                    </PrimaryButton>
-                </div>
-            </form>
+                                    <div className="d-grid">
+                                        <Button variant="primary" type="submit" disabled={processing}>
+                                            {processing ? 'Sending...' : 'Send Password Reset Link'}
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         </Layout>
     );
 }

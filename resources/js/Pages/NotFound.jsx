@@ -1,0 +1,19 @@
+import { Head } from '@inertiajs/react';
+import { Container } from 'react-bootstrap';
+import Layout from "@/Layouts/Layout.jsx";
+
+export default function Home({ auth }) {
+    return (
+        <Layout
+            user={auth.user}
+        >
+            <Head title="Not Found"/>
+
+            <Container className="my-auto justify-content-center">
+
+                <h1 className="text-center">404 Not Found</h1>
+                <p className="text-center">The page you are looking for does not exist</p>
+            </Container>
+        </Layout>
+    );
+}

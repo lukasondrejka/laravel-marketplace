@@ -65,3 +65,8 @@ Route::middleware('auth')->group(function () {
 
 // Auth
 require __DIR__.'/auth.php';
+
+// Not found
+Route::get('/{any}', function () {
+    return Inertia::render('NotFound');
+})->where('any', '.*');

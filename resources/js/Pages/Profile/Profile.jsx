@@ -7,9 +7,7 @@ import CardContainer from "@/Components/CardContainer.jsx";
 import UserCard from "@/Pages/Profile/Partials/UserCard.jsx";
 
 export default function Profile({ auth, user }) {
-
-    console.log(user)
-
+    console.log(user.items);
     return (
         <Layout
             user={auth.user}
@@ -17,6 +15,18 @@ export default function Profile({ auth, user }) {
             <Head title={user.name}/>
 
             <UserCard user={user} auth={auth} />
+
+            {user.items.length && (
+                <Container>
+                    <h2 className="text-center py-3">Items</h2>
+
+                    {user.items.map(item => (
+                        <ItemCard key={item.id} item={item}/>
+                    ))}
+                </Container>
+            )}
+
+
         </Layout>
     );
 }

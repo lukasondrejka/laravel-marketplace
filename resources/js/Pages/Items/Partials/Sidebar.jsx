@@ -1,5 +1,6 @@
 import {Button, Col, Form, Row} from "react-bootstrap";
 import {Link, useForm} from '@inertiajs/react';
+import {useState} from "react";
 
 export default function Sidebar({ categories }) {
     const params = new URLSearchParams(window.location.search);
@@ -11,8 +12,18 @@ export default function Sidebar({ categories }) {
         price_max: params.get('price_max') || '',
     });
 
+    const [invalidPrice, setInvalidPrice] = useState(false);
+
     function submit(e) {
         e.preventDefault();
+
+        // Check if min price is greater than max price
+        if (data.price_min && data.price_max && data.price_min > data.price_max) {
+            setInvalidPrice(true);
+            return;
+        } else {
+            setInvalidPrice(false);
+        }
 
         get(route('items.items'));
     }
@@ -42,6 +53,7 @@ export default function Sidebar({ categories }) {
                                 value={data.price_min}
                                 name="price_min"
                                 onChange={(e) => setData('price_min', e.target.value)}
+                                className={invalidPrice ? 'is-invalid' : ''}
                             />
                         </Col>
                         <Col>
@@ -52,9 +64,11 @@ export default function Sidebar({ categories }) {
                                 value={data.price_max}
                                 name="price_max"
                                 onChange={(e) => setData('price_max', e.target.value)}
+                                className={invalidPrice ? 'is-invalid' : ''}
                             />
                         </Col>
                     </Row>
+                    {invalidPrice && <Form.Control.Feedback type="invalid" className="d-block">Min price must be less than max price</Form.Control.Feedback>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">

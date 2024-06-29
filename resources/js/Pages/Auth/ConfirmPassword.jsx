@@ -1,9 +1,6 @@
 import { useEffect } from 'react';
 import Layout from '@/Layouts/Layout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import { Form, Button, Container, Row, Col, Alert, Card } from 'react-bootstrap';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function ConfirmPassword() {
@@ -27,33 +24,39 @@ export default function ConfirmPassword() {
         <Layout>
             <Head title="Confirm Password" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                This is a secure area of the application. Please confirm your password before continuing.
-            </div>
+            <Container className="my-5">
+                <Row className="justify-content-md-center">
+                    <Col lg="5" md="8">
+                        <Card>
+                            <Card.Body className="m-2">
+                                <Card.Title><h2 className="text-center">Confirm Password</h2></Card.Title>
+                                <div className="mb-4 text-sm text-gray-600">
+                                    This is a secure area of the application. Please confirm your password before continuing.
+                                </div>
 
-            <form onSubmit={submit}>
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                                <Form onSubmit={submit}>
+                                    <Form.Group controlId="password" className="my-4">
+                                        <Form.Label>Password</Form.Label>
+                                        <Form.Control
+                                            type="password"
+                                            value={data.password}
+                                            autoComplete="current-password"
+                                            onChange={(e) => setData('password', e.target.value)}
+                                        />
+                                        {errors.password && <Form.Text className="text-danger">{errors.password}</Form.Text>}
+                                    </Form.Group>
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Confirm
-                    </PrimaryButton>
-                </div>
-            </form>
+                                    <div className="d-grid">
+                                        <Button variant="primary" type="submit" disabled={processing}>
+                                            {processing ? 'Confirming...' : 'Confirm'}
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         </Layout>
     );
 }
