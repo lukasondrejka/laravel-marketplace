@@ -1,28 +1,24 @@
 import { Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
 export default function Sidebar({ categories }) {
   const params = new URLSearchParams(window.location.search);
 
-  const { data, setData, get } = useForm({
+  const { data, setData, get, errors, setError } = useForm({
     search: params.get('search') || '',
     category_id: params.get('category_id') || '',
     price_min: params.get('price_min') || '',
     price_max: params.get('price_max') || '',
   });
 
-  const [invalidPrice, setInvalidPrice] = useState(false);
-
   function submit(e) {
     e.preventDefault();
 
-    // Check if min price is greater than max price
-    if (data.price_min && data.price_max && data.price_min > data.price_max) {
-      setInvalidPrice(true);
+    if (data.price_min && data.price_max && parseInt(data.price_min) > parseInt(data.price_max)) {
+      setError('price_min', 'Min price must be less than max price');
       return;
     } else {
-      setInvalidPrice(false);
+      setError('price_min', '');
     }
 
     get(route('items.items'));
@@ -47,7 +43,7 @@ export default function Sidebar({ categories }) {
                 value={data.price_min}
                 name="price_min"
                 onChange={e => setData('price_min', e.target.value)}
-                className={invalidPrice ? 'is-invalid' : ''}
+                className={errors.price_min ? 'is-invalid' : ''}
               />
             </Col>
             <Col>
@@ -58,11 +54,11 @@ export default function Sidebar({ categories }) {
                 value={data.price_max}
                 name="price_max"
                 onChange={e => setData('price_max', e.target.value)}
-                className={invalidPrice ? 'is-invalid' : ''}
+                className={errors.price_min ? 'is-invalid' : ''}
               />
             </Col>
           </Row>
-          {invalidPrice && (
+          {errors.price_min && (
             <Form.Control.Feedback type="invalid" className="d-block">
               Min price must be less than max price
             </Form.Control.Feedback>
