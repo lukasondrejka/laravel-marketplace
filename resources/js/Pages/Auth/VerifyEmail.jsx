@@ -24,8 +24,8 @@ export default function VerifyEmail({ status }) {
                   <h2 className="text-center">Email Verification</h2>
                 </Card.Title>
                 <div className="mb-4 text-sm text-gray-600">
-                  Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you
-                  didn't receive the email, we will gladly send you another.
+                  Thanks for signing up! Before getting started, could you verify your email address by clicking on the
+                  link we just emailed to you? If you did not receive the email, we will gladly send you another.
                 </div>
 
                 {status === 'verification-link-sent' && (
@@ -40,7 +40,12 @@ export default function VerifyEmail({ status }) {
                       {processing ? 'Sending...' : 'Resend Verification Email'}
                     </Button>
 
-                    <Link href={route('logout')} method="post" as="button" className="btn btn-link text-sm text-gray-600 hover:text-gray-900">
+                    <Link
+                      href={route('logout')}
+                      method="post"
+                      as="button"
+                      className="btn btn-link text-sm text-gray-600 hover:text-gray-900"
+                    >
                       Log Out
                     </Link>
                   </div>

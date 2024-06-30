@@ -5,7 +5,6 @@ import { Head } from '@inertiajs/react';
 import { Container } from 'react-bootstrap';
 
 export default function Profile({ auth, user }) {
-  console.log(user.items);
   return (
     <Layout user={auth.user}>
       <Head title={user.name} />

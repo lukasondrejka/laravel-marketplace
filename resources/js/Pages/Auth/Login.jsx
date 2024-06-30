@@ -39,18 +39,33 @@ export default function Login({ status, canResetPassword }) {
                 <Form onSubmit={submit}>
                   <Form.Group controlId="email" className="my-4">
                     <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" value={data.email} autoComplete="username" onChange={e => setData('email', e.target.value)} />
+                    <Form.Control
+                      type="email"
+                      value={data.email}
+                      autoComplete="username"
+                      onChange={e => setData('email', e.target.value)}
+                    />
                     {errors.email && <Form.Text className="text-danger">{errors.email}</Form.Text>}
                   </Form.Group>
 
                   <Form.Group controlId="password" className="my-4">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" value={data.password} autoComplete="current-password" onChange={e => setData('password', e.target.value)} />
+                    <Form.Control
+                      type="password"
+                      value={data.password}
+                      autoComplete="current-password"
+                      onChange={e => setData('password', e.target.value)}
+                    />
                     {errors.password && <Form.Text className="text-danger">{errors.password}</Form.Text>}
                   </Form.Group>
 
                   <Form.Group controlId="remember" className="my-4">
-                    <Form.Check type="checkbox" label="Remember me" checked={data.remember} onChange={e => setData('remember', e.target.checked)} />
+                    <Form.Check
+                      type="checkbox"
+                      label="Remember me"
+                      checked={data.remember}
+                      onChange={e => setData('remember', e.target.checked)}
+                    />
                   </Form.Group>
 
                   <div className="d-grid">

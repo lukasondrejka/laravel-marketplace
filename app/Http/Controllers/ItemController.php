@@ -45,7 +45,7 @@ class ItemController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(self::ITEMS_PER_PAGE);
 
-        return Inertia::render('Items/Index', [
+        return Inertia::render('Items/Items', [
             'items' => $items,
             'categories' => Category::all(),
         ]);

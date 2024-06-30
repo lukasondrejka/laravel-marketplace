@@ -25,7 +25,9 @@ export default function ForgotPassword({ status }) {
                 <Card.Title>
                   <h2 className="text-center">Forgot Password</h2>
                 </Card.Title>
-                <div className="mb-4 text-sm text-gray-600">Enter your email address and we will send you a password reset link.</div>
+                <div className="mb-4 text-sm text-gray-600">
+                  Enter your email address and we will send you a password reset link.
+                </div>
 
                 {status && (
                   <Alert variant="success" className="mb-4">
@@ -36,7 +38,12 @@ export default function ForgotPassword({ status }) {
                 <Form onSubmit={submit}>
                   <Form.Group controlId="email" className="my-4">
                     <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" value={data.email} autoComplete="username" onChange={e => setData('email', e.target.value)} />
+                    <Form.Control
+                      type="email"
+                      value={data.email}
+                      autoComplete="username"
+                      onChange={e => setData('email', e.target.value)}
+                    />
                     {errors.email && <Form.Text className="text-danger">{errors.email}</Form.Text>}
                   </Form.Group>
 

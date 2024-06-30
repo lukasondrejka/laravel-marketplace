@@ -25,19 +25,12 @@ class ProfileController extends Controller
     }
 
     /**
-     * Display the current user's profile.
-     */
-    public function showCurrent(Request $request): Response
-    {
-        return $this->show($request->user()->id);
-    }
-
-    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [
+            'user' => $request->user()->only('name', 'email', 'phone_number', 'bio', 'location'),
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);

@@ -1,18 +1,17 @@
 import CardContainer from '@/Components/CardContainer.jsx';
+import SelectInput from '@/Components/Inputs/SelectInput.jsx';
+import TextareaInput from '@/Components/Inputs/TextareaInput.jsx';
+import TextInput from '@/Components/Inputs/TextInput.jsx';
 import Layout from '@/Layouts/Layout.jsx';
 import { Head, useForm } from '@inertiajs/react';
-import { Button, Col, Form } from 'react-bootstrap';
+import { Button, Col, Form, Row } from 'react-bootstrap';
 
-export default function Item({ auth, item = {}, categories }) {
-  const { data, setData, errors, put, post, reset, processing, recentlySuccessful } = useForm({
-    title: item.title || '',
-    category_id: item.category_id || '',
-    description: item.description || '',
-    price: item.price || '',
-  });
+export default function Item({ auth, item, categories }) {
+  const { data, setData, errors, post } = useForm(item);
 
   function submit(e) {
     e.preventDefault();
+
     if (item.id) {
       post(route('items.update', item.id));
     } else {
@@ -28,65 +27,51 @@ export default function Item({ auth, item = {}, categories }) {
 
       <CardContainer header={title}>
         <Form onSubmit={submit}>
-          <Form.Group className="mb-3 mt-3" controlId="titleInput">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              name="title"
-              defaultValue={data.title}
-              onChange={e => setData('title', e.target.value)}
-              className={errors.title ? 'is-invalid' : ''}
-            />
-            {errors.title && <Form.Control.Feedback type="invalid">{errors.title}</Form.Control.Feedback>}
-          </Form.Group>
+          <TextInput
+            className="mb-3"
+            name="title"
+            label="Title"
+            value={data.title}
+            onChange={v => setData('title', v)}
+            error={errors.title}
+          />
 
-          <Form.Group className="mb-3" controlId="categorySelect">
-            <Form.Label>Category</Form.Label>
-            <Form.Select
-              name="category"
-              defaultValue={data.category_id}
-              className={errors.category_id ? 'is-invalid' : ''}
-              onChange={e => e.target.value !== '' && setData('category_id', e.target.value)}
-            >
-              <option value="" disabled></option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </Form.Select>
-            {errors.category_id && (
-              <Form.Control.Feedback type="invalid" className="d-block">
-                {errors.category_id}
-              </Form.Control.Feedback>
-            )}
-          </Form.Group>
+          <Row>
+            <Col md="6">
+              <SelectInput
+                className="mb-3"
+                name="category_id"
+                label="Category"
+                value={data.category_id}
+                onChange={v => setData('category_id', v)}
+                error={errors.category_id}
+                options={[{ id: '', name: '', disabled: true }, ...categories]}
+              />
+            </Col>
 
-          <Form.Group className="mb-3" controlId="descriptionInput">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="description"
-              rows={8}
-              defaultValue={data.description}
-              onChange={e => setData('description', e.target.value)}
-              className={errors.description ? 'is-invalid' : ''}
-            />
-            {errors.description && <Form.Control.Feedback type="invalid">{errors.description}</Form.Control.Feedback>}
-          </Form.Group>
+            <Col md="6">
+              <TextInput
+                className="mb-3"
+                name="price"
+                label="Price"
+                type="number"
+                value={data.price}
+                onChange={v => setData('price', v)}
+                error={errors.price}
+                formControlProps={{ min: 0 }}
+              />
+            </Col>
+          </Row>
 
-          <Form.Group as={Col} md={3} className="mb-3" controlId="priceInput">
-            <Form.Label>Price</Form.Label>
-            <Form.Control
-              type="number"
-              min="0"
-              name="price"
-              defaultValue={data.price}
-              onChange={e => setData('price', e.target.value)}
-              className={errors.price ? 'is-invalid' : ''}
-            />
-            {errors.price && <Form.Control.Feedback type="invalid">{errors.price}</Form.Control.Feedback>}
-          </Form.Group>
+          <TextareaInput
+            className="mb-3"
+            name="description"
+            label="Description"
+            value={data.description}
+            rows="8"
+            onChange={v => setData('description', v)}
+            error={errors.description}
+          />
 
           <Button variant="primary" type="submit">
             Save

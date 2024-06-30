@@ -32,12 +32,19 @@ export default function ConfirmPassword() {
                 <Card.Title>
                   <h2 className="text-center">Confirm Password</h2>
                 </Card.Title>
-                <div className="mb-4 text-sm text-gray-600">This is a secure area of the application. Please confirm your password before continuing.</div>
+                <div className="mb-4 text-sm text-gray-600">
+                  This is a secure area of the application. Please confirm your password before continuing.
+                </div>
 
                 <Form onSubmit={submit}>
                   <Form.Group controlId="password" className="my-4">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" value={data.password} autoComplete="current-password" onChange={e => setData('password', e.target.value)} />
+                    <Form.Control
+                      type="password"
+                      value={data.password}
+                      autoComplete="current-password"
+                      onChange={e => setData('password', e.target.value)}
+                    />
                     {errors.password && <Form.Text className="text-danger">{errors.password}</Form.Text>}
                   </Form.Group>
 

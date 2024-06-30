@@ -22,7 +22,6 @@ use Inertia\Inertia;
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
-
 // Item
 Route::get('/items', [ItemController::class, 'index'])
     ->name('items.items');
@@ -53,7 +52,7 @@ Route::get('/user/{id}', [ProfileController::class, 'show'])
 
 // User Profile
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])
         ->name('profile.edit');
 
     Route::patch('/profile', [ProfileController::class, 'update'])

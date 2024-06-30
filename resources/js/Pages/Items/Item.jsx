@@ -7,15 +7,12 @@ import { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 export default function Item({ auth, item }) {
+  const { post } = useForm();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const { post } = useForm({});
 
   function remove() {
     post(route('items.destroy', item.id));
   }
-
-  console.log(item);
 
   return (
     <Layout user={auth.user}>

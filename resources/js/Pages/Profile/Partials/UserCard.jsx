@@ -6,9 +6,16 @@ export default function UserCard({ auth, user }) {
     <CardContainer header={user.name}>
       <p className="card-text">
         {user.items && (
-          <small className="text-muted">{user.items.length ? `${user.items.length} item${user.items.length > 1 ? 's' : ''}` : 'No items listed'}</small>
+          <small className="text-muted">
+            {user.items.length ? `${user.items.length} item${user.items.length > 1 ? 's' : ''}` : 'No items listed'}
+            {user.location && <> · Location: {user.location}</>}
+            {user.email && <> · Email: <a href={'mailto:' + user.email}>{user.email}</a></>}
+            {user.phone_number && <> · Phone: <a href={'tel:' + user.phone_number}>{user.phone_number}</a></>}
+          </small>
         )}
       </p>
+
+      {user.bio && <p className="card-text">{user.bio}</p>}
 
       {auth?.user?.id === user.id && (
         <div className="mt-2">

@@ -5,10 +5,9 @@ import Sidebar from '@/Pages/Items/Partials/Sidebar.jsx';
 import { Head, usePage } from '@inertiajs/react';
 import { Alert, Col, Container, Row } from 'react-bootstrap';
 
-export default function Index({ auth, items, categories }) {
+export default function Items({ auth, categories }) {
   const { items: itemsPage } = usePage().props;
 
-  console.log(itemsPage);
   return (
     <Layout user={auth.user}>
       <Head title="Items" />

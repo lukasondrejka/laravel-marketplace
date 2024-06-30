@@ -1,5 +1,8 @@
+import RangeInput from '@/Components/Inputs/RangeInput.jsx';
+import SelectInput from '@/Components/Inputs/SelectInput.jsx';
+import TextInput from '@/Components/Inputs/TextInput.jsx';
 import { Link, useForm } from '@inertiajs/react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 export default function Sidebar({ categories }) {
   const params = new URLSearchParams(window.location.search);
@@ -27,58 +30,40 @@ export default function Sidebar({ categories }) {
   return (
     <div className="z-0">
       <form onSubmit={submit}>
-        <Form.Group className="mb-3">
-          <Form.Label>{'Search'}</Form.Label>
-          <Form.Control type="text" placeholder="" value={data.search} name="search" onChange={e => setData('search', e.target.value)} />
-        </Form.Group>
+        <TextInput
+          className="mb-3"
+          label="Search"
+          name="search"
+          value={data.search}
+          onChange={e => setData('search', e.target.value)}
+        />
 
-        <Form.Group className="mb-3">
-          <Form.Label>{'Price'}</Form.Label>
-          <Row>
-            <Col>
-              <Form.Control
-                type="number"
-                min="0"
-                placeholder="Min"
-                value={data.price_min}
-                name="price_min"
-                onChange={e => setData('price_min', e.target.value)}
-                className={errors.price_min ? 'is-invalid' : ''}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                type="number"
-                min="0"
-                placeholder="Max"
-                value={data.price_max}
-                name="price_max"
-                onChange={e => setData('price_max', e.target.value)}
-                className={errors.price_min ? 'is-invalid' : ''}
-              />
-            </Col>
-          </Row>
-          {errors.price_min && (
-            <Form.Control.Feedback type="invalid" className="d-block">
-              Min price must be less than max price
-            </Form.Control.Feedback>
-          )}
-        </Form.Group>
+        <RangeInput
+          className="mb-3"
+          label="Price"
+          nameMin="price_min"
+          nameMax="price_max"
+          valueMin={data.price_min}
+          valueMax={data.price_max}
+          onChangeMin={v => setData('price_min', v)}
+          onChangeMax={v => setData('price_max', v)}
+          error={errors.price_min}
+          formControlPropsMin={{ min: 0, placeholder: 'Min' }}
+          formControlPropsMax={{ min: 0, placeholder: 'Max' }}
+        />
 
-        <Form.Group className="mb-3">
-          <Form.Label>Category</Form.Label>
-          <Form.Select value={data.category_id} name="category_id" onChange={e => setData('category_id', e.target.value)}>
-            <option value="">All</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
+        <SelectInput
+          className="mb-3"
+          label="Category"
+          name="category_id"
+          value={data.category_id}
+          onChange={v => setData('category_id', v)}
+          error={errors.category_id}
+          options={[{ id: '', name: 'All' }, ...categories]}
+        />
 
         <div className="my-4 d-grid">
-          <Button type="submit" variant="primary" size="lg" block>
+          <Button type="submit" variant="primary" size="lg">
             Search
           </Button>
         </div>
