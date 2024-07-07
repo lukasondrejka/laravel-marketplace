@@ -9,8 +9,18 @@ export default function UserCard({ auth, user }) {
           <small className="text-muted">
             {user.items.length ? `${user.items.length} item${user.items.length > 1 ? 's' : ''}` : 'No items listed'}
             {user.location && <> · Location: {user.location}</>}
-            {user.email && <> · Email: <a href={'mailto:' + user.email}>{user.email}</a></>}
-            {user.phone_number && <> · Phone: <a href={'tel:' + user.phone_number}>{user.phone_number}</a></>}
+            {user.email && (
+              <>
+                {' '}
+                · Email: <a href={'mailto:' + user.email}>{user.email}</a>
+              </>
+            )}
+            {user.phone_number && (
+              <>
+                {' '}
+                · Phone: <a href={'tel:' + user.phone_number}>{user.phone_number}</a>
+              </>
+            )}
           </small>
         )}
       </p>
