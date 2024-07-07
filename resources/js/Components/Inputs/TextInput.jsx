@@ -7,7 +7,7 @@ export default function TextInput({ label, name, type = 'text', value, onChange,
       <Form.Control
         {...formControlProps}
         type={type}
-        value={value}
+        value={value || ''}
         onChange={e => onChange(e.target.value)}
         className={error ? 'is-invalid' : ''}
       />

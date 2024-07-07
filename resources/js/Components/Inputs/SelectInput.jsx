@@ -6,7 +6,7 @@ export default function SelectInput({ label, name, options, value, onChange, cla
       <Form.Label>{label}</Form.Label>
       <Form.Select
         name={name}
-        defaultValue={value}
+        value={value}
         className={error ? 'is-invalid' : ''}
         onChange={e => onChange(e.target.value)}
       >

@@ -20,7 +20,7 @@ export default function TextareaInput({
         name={name}
         rows={rows}
         type={type}
-        defaultValue={value}
+        defaultValue={value || ''}
         onChange={e => onChange(e.target.value)}
         className={error ? 'is-invalid' : ''}
       />

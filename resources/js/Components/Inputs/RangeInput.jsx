@@ -22,7 +22,7 @@ export default function RangeInput({
           <Form.Control
             {...formControlPropsMin}
             type={type}
-            value={valueMin}
+            value={valueMin || ''}
             name={nameMin}
             onChange={e => onChangeMin(e.target.value)}
             className={error ? 'is-invalid' : ''}
@@ -32,7 +32,7 @@ export default function RangeInput({
           <Form.Control
             {...formControlPropsMax}
             type={type}
-            value={valueMax}
+            value={valueMax || ''}
             name={nameMax}
             onChange={e => onChangeMax(e.target.value)}
             className={error ? 'is-invalid' : ''}
