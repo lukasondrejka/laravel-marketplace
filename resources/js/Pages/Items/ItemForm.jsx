@@ -12,7 +12,7 @@ export default function Item({ auth, item, categories }) {
   function submit(e) {
     e.preventDefault();
 
-    if (item.id) {
+    if (item?.id) {
       post(route('items.update', item.id));
     } else {
       post(route('items.create'));
