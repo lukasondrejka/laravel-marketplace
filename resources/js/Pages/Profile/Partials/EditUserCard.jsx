@@ -1,14 +1,13 @@
 import CardContainer from '@/Components/CardContainer.jsx';
 import TextareaInput from '@/Components/Inputs/TextareaInput.jsx';
 import TextInput from '@/Components/Inputs/TextInput.jsx';
-import { Transition } from '@headlessui/react';
-import { Link, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
 export default function EditUserCard({ user, mustVerifyEmail, status }) {
   // const user = usePage().props.auth.user;
 
-  const { data, setData, patch, errors, processing, get} = useForm(user);
+  const { data, setData, patch, errors, processing } = useForm(user);
 
   const submit = e => {
     e.preventDefault();

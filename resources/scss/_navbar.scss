@@ -12,6 +12,7 @@ $navbar-text-color: #FFFFFFFF;
     .nav-link.active {
         color: $navbar-text-color;
         transition: all 0.2s;
+
         &:hover {
             color: rgba($navbar-text-color, 0.8);
         }
