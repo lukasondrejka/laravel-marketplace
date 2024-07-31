@@ -16,21 +16,6 @@ jobs:
           verboseMode: true
           testMode: true
 
-  setup_node:
-    name: Setup Node.js
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-
   lint_javascript:
     name: Lint JavaScript
     needs: setup_node
@@ -66,3 +51,18 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run stylelint
+
+  setup_node:
+    name: Setup Node
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
