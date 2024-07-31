@@ -1,0 +1,68 @@
+name: Lint
+on: [push]
+jobs:
+
+  lint_php:
+    name: Lint PHP
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Lint
+        uses: aglipanci/laravel-pint-action@2.4
+        with:
+          preset: laravel
+          verboseMode: true
+          testMode: true
+
+  setup_node:
+    name: Setup Node.js
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+
+  lint_javascript:
+    name: Lint JavaScript
+    needs: setup_node
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run eslint
+
+  lint_sass:
+    name: Lint Sass (scss)
+    needs: setup_node
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run stylelint
