@@ -24,7 +24,7 @@ class Item extends Model
         'title',
         'description',
         'price',
-        'category_id'
+        'category_id',
 
     ];
 
@@ -40,13 +40,11 @@ class Item extends Model
 
     /**
      * Teaser of the description.
-     *
-     * @return Attribute
      */
     protected function teaser(): Attribute
     {
         $value = strlen($this->description) > self::TEASER_LENGTH
-            ? substr($this->description, 0, self::TEASER_LENGTH) . '…'
+            ? substr($this->description, 0, self::TEASER_LENGTH).'…'
             : $this->description;
 
         return new Attribute(get: fn () => $value);
@@ -54,19 +52,16 @@ class Item extends Model
 
     /**
      * Rich text description.
-     *
-     * @return Attribute
      */
     public function richTextDescription(): Attribute
     {
-        $value =  nl2br(preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@',
-                '<a target="_blank" href="$1">$1</a> ',
-                e($this->description) . " ")
+        $value = nl2br(preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@',
+            '<a target="_blank" href="$1">$1</a> ',
+            e($this->description).' ')
         );
 
         return new Attribute(get: fn () => $value);
     }
-
 
     /**
      * Get the user that owns the item.

@@ -32,10 +32,10 @@ class ItemController extends Controller
 
         $items = Item::with('category')
             ->when($words, fn ($query, $words) => $query->where(function ($query) use ($words) {
-                foreach ($words as $word){
+                foreach ($words as $word) {
                     $query->where(function ($sub_query) use ($word) {
-                        $sub_query->where('title', 'like', '%' . $word . '%')
-                            ->orWhere('description', 'like', '%' . $word . '%');
+                        $sub_query->where('title', 'like', '%'.$word.'%')
+                            ->orWhere('description', 'like', '%'.$word.'%');
                     });
                 }
             }))

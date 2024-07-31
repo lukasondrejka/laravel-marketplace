@@ -4,6 +4,7 @@ import TextInput from '@/Components/Inputs/TextInput.jsx';
 import { useForm } from '@inertiajs/react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
+// eslint-disable-next-line no-unused-vars
 export default function EditUserCard({ user, mustVerifyEmail, status }) {
   // const user = usePage().props.auth.user;
 

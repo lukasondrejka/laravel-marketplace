@@ -3,7 +3,6 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
