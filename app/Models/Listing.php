@@ -43,7 +43,7 @@ class Listing extends Model implements HasMedia
 
     public static function uniqueSlug(string $title): string
     {
-        $base = Str::limit(Str::slug($title) ?: 'listing', 80, '');
+        $base = rtrim(Str::limit(Str::slug($title) ?: 'listing', 80, ''), '-');
         $slug = $base;
 
         while (in_array($slug, self::RESERVED_SLUGS, true) || static::withTrashed()->where('slug', $slug)->exists()) {
@@ -185,13 +185,17 @@ class Listing extends Model implements HasMedia
     }
 
     /**
-     * Multi-word AND search over title and description. Blank words are ignored.
+     * Multi-word AND search over title and description. Blank words are ignored; input is capped
+     * (100 characters, 8 words) so a crafted query cannot build a huge SQL statement.
+     *
+     * Accent- and case-insensitivity ("kosice" finds "Košice") comes from the MySQL utf8mb4_unicode_ci
+     * collation; SQLite's LIKE only folds ASCII case.
      *
      * @param  Builder<Listing>  $query
      */
     public function scopeSearch(Builder $query, ?string $keyword): void
     {
-        $words = preg_split('/[\s,]+/u', trim((string) $keyword), -1, PREG_SPLIT_NO_EMPTY);
+        $words = array_slice(preg_split('/[\s,]+/u', mb_substr(trim((string) $keyword), 0, 100), -1, PREG_SPLIT_NO_EMPTY), 0, 8);
 
         foreach ($words as $word) {
             $like = '%'.addcslashes($word, '\\%_').'%';
