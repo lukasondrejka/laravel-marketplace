@@ -6,9 +6,10 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "laravel/fortify": "^1.41",
         "laravel/framework": "^13.17",
+        "laravel/socialite": "^5.31",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4",
         "spatie/laravel-medialibrary": "^11.23"
@@ -44,13 +45,16 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
-            "npm install --ignore-scripts",
+            "@php artisan storage:link",
+            "npm install",
             "npm run build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
         ],
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "lint": "vendor/bin/pint --test",
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
