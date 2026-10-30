@@ -1,5 +1,7 @@
 # Marketplace
 
+[![CI](https://github.com/lukasondrejka/laravel-marketplace/actions/workflows/ci.yml/badge.svg)](https://github.com/lukasondrejka/laravel-marketplace/actions/workflows/ci.yml)
+
 A classifieds marketplace (think local "buy and sell" ads) built as a showcase Laravel application.
 Users post listings with multiple photos, browse and filter other people's listings, and manage their own ads from a dashboard.
 
@@ -63,6 +65,7 @@ Set `APP_PORT`, `VITE_PORT` or `MAILPIT_PORT` in your shell or in a `.env` next 
 make up        # docker compose up -d --build
 make fresh     # migrate:fresh --seed
 make test      # run the Pest suite
+make coverage  # tests with coverage
 make pint      # format code
 make build     # production asset build (npm run build)
 make shell     # shell in the app container
@@ -74,12 +77,34 @@ Image conversions run through the queue. The default `QUEUE_CONNECTION=sync` pro
 ## Tests
 
 ```bash
-docker compose exec app php artisan test
-docker compose exec app vendor/bin/pint --test
-docker compose exec app composer analyse
+docker compose exec app php artisan test              # whole suite (SQLite in memory)
+docker compose exec app composer test:coverage        # + coverage (pcov), HTML in build/coverage, gate at 95%
+docker compose exec app vendor/bin/pint --test        # style (composer lint)
+docker compose exec app composer analyse              # Larastan
 ```
 
-Tests use SQLite in memory and `Storage::fake`. They cover authentication, profile management, browsing/search/filter/sort, listing CRUD, image upload rules and ownership checks, status transitions and policies.
+Tests use SQLite in memory, `Storage::fake` and `Mail::fake`. They cover authentication, social login, profile management, browsing/search/filter/sort, listing CRUD, image upload rules and ownership checks, status transitions, policies, rate limits, mail rendering, seeders and translation key completeness. Line coverage is about 99%. See [docs/testing.md](docs/testing.md) for the full matrix, including what is deliberately not tested.
+
+Accent-insensitive search (`zlty` finds `Žltý`) relies on the MySQL collation, so those tests are skipped on SQLite. Run the whole suite against the Compose MySQL like this:
+
+```bash
+docker compose exec db mysql -uroot -psecret -e "create database if not exists marketplace_test; grant all on marketplace_test.* to marketplace@'%';"
+docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=marketplace_test app php artisan test
+```
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request (a newer push cancels the older run; permissions are read-only except `checks: write` for the test report):
+
+| Job | What |
+|---|---|
+| `lint` | `composer lint` (Pint) |
+| `analyse` | `composer analyse` (Larastan) |
+| `assets` | `npm ci && npm run build`, shared with the test jobs as an artifact |
+| `tests` | Pest on PHP 8.4 / SQLite with pcov; fails below 95% line coverage |
+| `tests-mysql` | The same suite against a MySQL 8.4 service (includes the diacritics search tests) |
+
+The `tests` job writes a coverage summary to the job summary, publishes the JUnit results as a "Pest test report" check with annotations on failures (`mikepenz/action-junit-report`), and uploads `junit.xml`, `clover.xml` and the HTML coverage report as the `test-results` artifact. Composer and npm downloads are cached.
 
 ## Project structure
 

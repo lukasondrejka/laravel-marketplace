@@ -1,4 +1,4 @@
-.PHONY: up down setup seed fresh test pint shell build
+.PHONY: up down setup seed fresh test coverage pint shell build
 
 up:
 	docker compose up -d --build
@@ -17,6 +17,9 @@ fresh:
 
 test:
 	docker compose exec app php artisan test
+
+coverage:
+	docker compose exec app composer test:coverage
 
 pint:
 	docker compose exec app vendor/bin/pint
