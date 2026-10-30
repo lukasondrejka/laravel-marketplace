@@ -21,6 +21,15 @@ class ListingPolicy
         return $user->hasVerifiedEmail();
     }
 
+    /**
+     * Making a listing publicly visible needs the same verified email as creating one
+     * (an email change resets verification, so this cannot be bypassed from the dashboard).
+     */
+    public function publish(User $user, Listing $listing): bool
+    {
+        return $listing->isOwnedBy($user) && $user->hasVerifiedEmail();
+    }
+
     public function update(User $user, Listing $listing): bool
     {
         return $listing->isOwnedBy($user);

@@ -27,10 +27,10 @@ class Dashboard extends Component
     /**
      * Resolve a listing owned by the current user; other users' ids are a 404/403.
      */
-    private function ownedListing(int $id): Listing
+    private function ownedListing(int $id, string $ability = 'update'): Listing
     {
         $listing = Listing::findOrFail($id);
-        $this->authorize('update', $listing);
+        $this->authorize($ability, $listing);
 
         return $listing;
     }
@@ -40,7 +40,9 @@ class Dashboard extends Component
         $target = ListingStatus::tryFrom($status);
         abort_if($target === null, 422);
 
-        $action->handle($this->ownedListing($id), $target);
+        $listing = $this->ownedListing($id, $target === ListingStatus::Active ? 'publish' : 'update');
+
+        $action->handle($listing, $target);
 
         $this->dispatch('notify', type: 'success', message: __('Listing marked as :status.', ['status' => mb_strtolower($target->label())]));
     }
@@ -56,9 +58,8 @@ class Dashboard extends Component
     {
         abort_if($this->deleting === null, 422);
 
-        $listing = $this->ownedListing($this->deleting);
+        $listing = $this->ownedListing($this->deleting, 'delete');
         $this->deleting = null;
-        $this->authorize('delete', $listing);
 
         $action->handle($listing);
 
