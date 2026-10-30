@@ -66,6 +66,7 @@ make up        # docker compose up -d --build
 make fresh     # migrate:fresh --seed
 make test      # run the Pest suite
 make coverage  # tests with coverage
+make e2e       # browser (E2E) tests: Pest Browser plugin + Chromium
 make pint      # format code
 make build     # production asset build (npm run build)
 make shell     # shell in the app container
@@ -78,12 +79,24 @@ Image conversions run through the queue. The default `QUEUE_CONNECTION=sync` pro
 
 ```bash
 docker compose exec app php artisan test              # whole suite (SQLite in memory)
+docker compose exec app composer test:e2e             # browser tests (tests/Browser), not part of the line above
 docker compose exec app composer test:coverage        # + coverage (pcov), HTML in build/coverage, gate at 95%
 docker compose exec app vendor/bin/pint --test        # style (composer lint)
 docker compose exec app composer analyse              # Larastan
 ```
 
 Tests use SQLite in memory, `Storage::fake` and `Mail::fake`. They cover authentication, social login, profile management, browsing/search/filter/sort, listing CRUD, image upload rules and ownership checks, status transitions, policies, rate limits, mail rendering, seeders and translation key completeness. Line coverage is about 99%. See [docs/testing.md](docs/testing.md) for the full matrix, including what is deliberately not tested.
+
+### Browser (E2E) tests
+
+`tests/Browser` holds Pest Browser plugin tests (Playwright driving Chromium) for the critical paths: register/login, listing creation with image upload (file input, drag and drop, reorder, cover), publishing, gallery lightbox, theme toggle and persistence, search/filter and grid/list, delete confirmation, contact form, 404 and a console/asset health check of the main pages in both themes. They are not listed in `phpunit.xml`, so `php artisan test` and the coverage gate never run them.
+
+```bash
+make e2e                                              # or: docker compose exec app composer test:e2e
+docker compose exec app vendor/bin/pest tests/Browser --filter=lightbox
+```
+
+The Docker image contains Node and Chromium (`PLAYWRIGHT_BROWSERS_PATH=/ms-playwright`); rebuild it once with `docker compose build app` (the first build downloads about 300 MB). The tests need a production asset build (`make build`); a Vite dev server's `public/hot` file is ignored. Failure screenshots land in `tests/Browser/Screenshots` (git-ignored).
 
 Accent-insensitive search (`zlty` finds `Žltý`) relies on the MySQL collation, so those tests are skipped on SQLite. Run the whole suite against the Compose MySQL like this:
 
@@ -102,9 +115,10 @@ docker compose exec -e DB_CONNECTION=mysql -e DB_DATABASE=marketplace_test app p
 | `analyse` | `composer analyse` (Larastan) |
 | `assets` | `npm ci && npm run build`, shared with the test jobs as an artifact |
 | `tests` | Pest on PHP 8.4 / SQLite with pcov; fails below 95% line coverage |
+| `e2e` | Pest Browser tests in Chromium against the built assets (Playwright browsers cached) |
 | `tests-mysql` | The same suite against a MySQL 8.4 service (includes the diacritics search tests) |
 
-The `tests` job writes a coverage summary to the job summary, publishes the JUnit results as a "Pest test report" check with annotations on failures (`mikepenz/action-junit-report`), and uploads `junit.xml`, `clover.xml` and the HTML coverage report as the `test-results` artifact. Composer and npm downloads are cached.
+The `tests` job writes a coverage summary to the job summary, publishes the JUnit results as a "Pest test report" check with annotations on failures (`mikepenz/action-junit-report`), and uploads `junit.xml`, `clover.xml` and the HTML coverage report as the `test-results` artifact. The `e2e` job publishes an "E2E test report" check the same way and uploads `e2e-results` (JUnit, failure screenshots, app logs). Composer and npm downloads are cached.
 
 ## Project structure
 

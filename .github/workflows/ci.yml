@@ -248,3 +248,95 @@ jobs:
 
       # Same suite on the production database: also runs the accent-insensitive search tests that SQLite skips.
       - run: vendor/bin/pest --compact
+
+  e2e:
+    name: E2E (Pest Browser, Chromium)
+    needs: assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      checks: write # publish the JUnit report as a check run with annotations
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          # sockets is required by the Pest browser plugin (its in-process HTTP server).
+          extensions: gd, intl, exif, bcmath, zip, pdo_sqlite, sockets
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      # The browser tests use the production build, not a Vite dev server.
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: vite-build
+          path: public/build
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # Only the Playwright driver is needed from npm (the assets come from the build artifact).
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium and system dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # Browser binaries come from the cache, the OS libraries they need do not.
+      - name: Install system dependencies only
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      - name: Run browser tests
+        run: |
+          mkdir -p build
+          composer test:e2e
+
+      - name: Publish E2E report
+        if: always()
+        uses: mikepenz/action-junit-report@v6.6.1
+        with:
+          report_paths: build/e2e-junit.xml
+          check_name: E2E test report
+          detailed_summary: true
+          include_passed: false
+          annotate_only: false
+          fail_on_failure: false
+
+      # Failure screenshots are written by the Pest browser plugin to tests/Browser/Screenshots.
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: e2e-results
+          path: |
+            build/e2e-junit.xml
+            tests/Browser/Screenshots
+            storage/logs
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,6 +1,6 @@
 # Test strategy and matrix
 
-Stack: Pest 4 on PHPUnit 12, Livewire testing helpers, SQLite in memory (default), `Storage::fake`, `Mail::fake`.
+Stack: Pest 4 on PHPUnit 12, Livewire testing helpers, SQLite in memory (default), `Storage::fake`, `Mail::fake`. Browser tests: `pestphp/pest-plugin-browser` 4.x (5.x needs Pest 5) on Playwright/Chromium.
 Run `composer test:coverage` for tests plus coverage (needs pcov, which the Docker image has). Line coverage is about 99% (gate: 95%).
 
 Status legend: **existing** = was there before this review, **added** = written during it, **skipped** = deliberately not tested (reason given).
@@ -26,6 +26,25 @@ Status legend: **existing** = was there before this review, **added** = written 
 | Profile | Update, email change resets verification, uniqueness, phone format, avatar upload/replace/remove, size and type limits, blank fields stored as null, password change rules, account deletion | existing + added | `Feature/Profile/ProfileTest` |
 | Error pages and health | 404 page, 403, `/up` | added | `Feature/PlatformTest` |
 | Seeders | Categories idempotent, demo data complete and loginable | added | `Feature/SeederTest` |
+
+## Browser (E2E) level
+
+Run with `make e2e` / `composer test:e2e` (`tests/Browser`, group `e2e`). Outside the `phpunit.xml` suites, so the default run and the 95% coverage gate are unaffected. The plugin serves the app in-process on a random port, so the SQLite in-memory database, `Mail::fake` and `actingAs` work as in feature tests. Test-only glue is in `tests/Pest.php`: built assets are forced (no Vite hot file), media is written to `public/e2e-storage` and removed afterwards, a middleware rebuilds multipart bodies (the plugin's server does not parse them, Livewire uploads need it), uploads are injected from the page because the Playwright server is remote, and `e2eWait()` polls inside the browser because the plugin's assertions do not wait. Selectors are `data-testid` attributes or roles/names.
+
+| Flow | What is verified | Where |
+|---|---|---|
+| Register, login, logout, wrong password | Real forms and redirects | `Browser/AuthTest` |
+| Create listing with upload | File input upload, preview, publish, redirect, saved media | `Browser/ListingFormTest` |
+| Drag and drop, reorder, make cover, remove | Drop-zone upload of 3 files, native drag reorder, cover button, order persisted | same |
+| Publish from dashboard, delete confirmation | Draft becomes active; cancel keeps, confirm deletes | `Browser/DashboardTest` |
+| Gallery lightbox | Open, next, close button, Escape | `Browser/ListingPageTest` |
+| Contact seller | Success message, mail to seller with reply-to, validation | same |
+| Theme | Toggle, persistence after reload and navigation, system preference fallback | `Browser/ThemeTest` |
+| Search, filters, grid/list | Keyword and category, clear filters, empty state, layout in URL | `Browser/BrowseTest` |
+| Health | No JS errors, console logs, broken images or failed asset requests on home, browse, listing, login and dashboard in light and dark | `Browser/SiteHealthTest` |
+| 404 | Friendly page for unknown URL and listing | same |
+
+Failure screenshots are saved to `tests/Browser/Screenshots`; Playwright traces and video are not produced by the plugin.
 
 ## Unit level
 
@@ -59,7 +78,7 @@ Status legend: **existing** = was there before this review, **added** = written 
 
 ## Deliberately skipped
 
-- **Browser behaviour** (Alpine gallery, drag and drop, theme toggle, upload progress): needs a browser driver (Dusk/Playwright); the server side of those features is tested through Livewire.
+- **Upload progress bar, touch gestures and other browsers**: the browser tests run Chromium only, at desktop size.
 - **Real OAuth round trip with Google/Facebook**: depends on third parties; the provider is mocked at the Socialite factory boundary.
 - **Real mail delivery / Mailpit**: `Mail::fake` plus rendering the mailable.
 - **Queue workers**: conversions run on the `sync` queue in tests; worker behaviour is Laravel's.
