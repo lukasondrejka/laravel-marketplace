@@ -7,8 +7,9 @@ use App\Actions\Listings\UpdateListing;
 use App\Livewire\Forms\ListingForm;
 use App\Models\Category;
 use App\Models\Listing;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -18,6 +19,8 @@ use Livewire\WithFileUploads;
 class Form extends Component
 {
     use WithFileUploads;
+
+    public const CREATE_LIMIT_PER_HOUR = 20;
 
     public ListingForm $form;
 
@@ -171,6 +174,16 @@ class Form extends Component
             session()->flash('success', __('Listing saved.'));
         } else {
             $this->authorize('create', Listing::class);
+
+            $key = 'listing-create:'.auth()->id();
+
+            if (RateLimiter::tooManyAttempts($key, self::CREATE_LIMIT_PER_HOUR)) {
+                $this->addError('form.title', __('You are posting too fast. Please try again later.'));
+
+                return null;
+            }
+
+            RateLimiter::hit($key, 3600);
             $data['status'] = $status === 'active' ? 'active' : 'draft';
             $listing = app(CreateListing::class)->handle(
                 auth()->user(),
