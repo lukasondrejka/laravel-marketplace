@@ -108,18 +108,6 @@ class Form extends Component
         unset($this->newImages[$key]);
     }
 
-    public function moveImage(string $key, int $direction): void
-    {
-        $index = array_search($key, $this->imageOrder, true);
-        $target = $index === false ? null : $index + $direction;
-
-        if ($target === null || $target < 0 || $target >= count($this->imageOrder)) {
-            return;
-        }
-
-        [$this->imageOrder[$index], $this->imageOrder[$target]] = [$this->imageOrder[$target], $this->imageOrder[$index]];
-    }
-
     /**
      * Drag and drop: place an image at a zero-based position.
      */
