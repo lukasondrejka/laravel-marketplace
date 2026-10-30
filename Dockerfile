@@ -5,7 +5,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions \
     && apt-get update \
     && apt-get install -y --no-install-recommends git unzip curl sqlite3 default-mysql-client \
     && rm -rf /var/lib/apt/lists/* \
-    && install-php-extensions gd pdo_mysql pdo_sqlite intl zip bcmath pcntl exif opcache
+    && install-php-extensions gd pdo_mysql pdo_sqlite intl zip bcmath pcntl exif opcache pcov
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-app.ini
