@@ -21,6 +21,11 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * @property ListingStatus $status
+ * @property ListingType $type
+ * @property ListingCondition $condition
+ */
 #[Fillable(['category_id', 'type', 'title', 'description', 'price', 'currency', 'condition', 'status', 'city', 'show_phone', 'published_at'])]
 class Listing extends Model implements HasMedia
 {

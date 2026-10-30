@@ -13,6 +13,9 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+/**
+ * @property-read Collection<int, Category> $categories
+ */
 class Index extends Component
 {
     use WithPagination;

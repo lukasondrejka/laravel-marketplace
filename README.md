@@ -112,7 +112,7 @@ tests/                Pest feature and unit tests
 - Contact details come from the profile: the phone number is shown only on listings where "Show my phone number" is ticked; everything else goes through the on-site message form.
 - Optional social login: set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (and/or `FACEBOOK_*`) and the buttons appear. An existing account is linked by email only if that account's email is verified.
 - Design: one accent colour on neutral greys, flat bordered surfaces, small radii, no gradients or shadows; tokens live in `resources/css/app.css` as daisyUI themes (light and dark).
-- Larastan runs at level 5 with a small baseline (`phpstan-baseline.neon`) caused by enum casts declared in `casts()` that the analyser does not resolve.
+- Larastan runs at level 5 with no baseline. Enum casts are declared with `@property` annotations on `Listing` because the analyser does not resolve them from `casts()`.
 
 ## License
 
