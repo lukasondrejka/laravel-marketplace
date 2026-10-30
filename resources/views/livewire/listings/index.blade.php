@@ -47,8 +47,8 @@
                     </select>
                 </div>
                 <div class="join" role="group" aria-label="{{ __('Layout') }}">
-                    <button type="button" wire:click="$set('view', 'grid')" @class(['btn btn-sm join-item', 'btn-active' => $view === 'grid']) aria-label="{{ __('Grid view') }}" aria-pressed="{{ $view === 'grid' ? 'true' : 'false' }}"><x-icon name="squares" class="size-4" /></button>
-                    <button type="button" wire:click="$set('view', 'list')" @class(['btn btn-sm join-item', 'btn-active' => $view === 'list']) aria-label="{{ __('List view') }}" aria-pressed="{{ $view === 'list' ? 'true' : 'false' }}"><x-icon name="list" class="size-4" /></button>
+                    <button type="button" data-testid="view-grid" wire:click="$set('view', 'grid')" @class(['btn btn-sm join-item', 'btn-active' => $view === 'grid']) aria-label="{{ __('Grid view') }}" aria-pressed="{{ $view === 'grid' ? 'true' : 'false' }}"><x-icon name="squares" class="size-4" /></button>
+                    <button type="button" data-testid="view-list" wire:click="$set('view', 'list')" @class(['btn btn-sm join-item', 'btn-active' => $view === 'list']) aria-label="{{ __('List view') }}" aria-pressed="{{ $view === 'list' ? 'true' : 'false' }}"><x-icon name="list" class="size-4" /></button>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
                     <p class="text-base-content/60">{{ __('Try different keywords or remove some filters.') }}</p>
                 </x-card>
             @else
-                <div @class(['grid gap-4', 'grid-cols-2 xl:grid-cols-3' => $view === 'grid', 'grid-cols-1' => $view === 'list'])>
+                <div data-testid="listing-results" data-layout="{{ $view }}" @class(['grid gap-4', 'grid-cols-2 xl:grid-cols-3' => $view === 'grid', 'grid-cols-1' => $view === 'list'])>
                     @foreach ($this->listings as $listing)
                         <x-listing-card :listing="$listing" :layout="$view === 'list' ? 'list' : 'grid'" wire:key="listing-{{ $listing->id }}" />
                     @endforeach

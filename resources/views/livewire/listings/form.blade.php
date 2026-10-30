@@ -93,6 +93,7 @@
                                 @endphp
                                 <li
                                     wire:key="img-{{ $key }}"
+                                    data-testid="image-tile"
                                     draggable="true"
                                     @dragstart="drag = @js($key); $event.dataTransfer.effectAllowed = 'move'"
                                     @dragend="drag = null"
@@ -113,7 +114,7 @@
                                     @endif
                                     <div class="flex items-center justify-between gap-1 p-1.5 border-t border-base-300">
                                         @if ($i !== 0)
-                                            <button type="button" class="btn btn-ghost btn-xs" wire:click="makeCover('{{ $key }}')">{{ __('Make cover') }}</button>
+                                            <button type="button" data-testid="make-cover" class="btn btn-ghost btn-xs" wire:click="makeCover('{{ $key }}')">{{ __('Make cover') }}</button>
                                         @else
                                             <span></span>
                                         @endif
@@ -132,8 +133,8 @@
                 <x-button :href="route('listings.show', $listing)" wire:navigate variant="ghost">{{ __('Cancel') }}</x-button>
                 <x-button variant="primary" wire:click="save" loading="save" wire:loading.attr="disabled">{{ __('Save changes') }}</x-button>
             @else
-                <x-button wire:click="save('draft')" loading="save" wire:loading.attr="disabled">{{ __('Save as draft') }}</x-button>
-                <x-button variant="primary" wire:click="save('active')" loading="save" wire:loading.attr="disabled">{{ __('Publish') }}</x-button>
+                <x-button data-testid="save-draft" wire:click="save('draft')" loading="save" wire:loading.attr="disabled">{{ __('Save as draft') }}</x-button>
+                <x-button variant="primary" data-testid="publish" wire:click="save('active')" loading="save" wire:loading.attr="disabled">{{ __('Publish') }}</x-button>
             @endif
         </div>
     </form>

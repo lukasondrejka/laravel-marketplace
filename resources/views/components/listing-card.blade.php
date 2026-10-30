@@ -1,6 +1,6 @@
 @props(['listing', 'showStatus' => false, 'layout' => 'grid'])
 @php $cover = $listing->coverUrl('thumb'); @endphp
-<article {{ $attributes->class([
+<article data-testid="listing-card" {{ $attributes->class([
     'group bg-base-100 border border-base-300 rounded-box overflow-hidden transition-colors hover:border-base-content/30',
     'flex' => $layout === 'list',
 ]) }}>

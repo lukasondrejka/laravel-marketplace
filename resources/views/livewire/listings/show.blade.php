@@ -32,13 +32,13 @@
                     <div>
                         <div class="relative aspect-4/3 bg-base-200">
                             <template x-for="(image, i) in images" :key="i">
-                                <img x-show="current === i" @click="zoom = true" :src="image.large" :alt="image.alt" class="absolute inset-0 size-full object-contain cursor-zoom-in" :loading="i === 0 ? 'eager' : 'lazy'">
+                                <img data-testid="gallery-image" x-show="current === i" @click="zoom = true" :src="image.large" :alt="image.alt" class="absolute inset-0 size-full object-contain cursor-zoom-in" :loading="i === 0 ? 'eager' : 'lazy'">
                             </template>
                             <template x-if="images.length > 1">
                                 <div>
                                     <button type="button" @click="prev()" class="btn btn-circle btn-sm absolute left-3 top-1/2 -translate-y-1/2" aria-label="{{ __('Previous image') }}"><x-icon name="chevron-left" class="size-4" /></button>
                                     <button type="button" @click="next()" class="btn btn-circle btn-sm absolute right-3 top-1/2 -translate-y-1/2" aria-label="{{ __('Next image') }}"><x-icon name="chevron-right" class="size-4" /></button>
-                                    <span class="absolute bottom-3 right-3 rounded bg-black/60 px-2 py-0.5 text-xs text-white" x-text="(current + 1) + ' / ' + images.length"></span>
+                                    <span data-testid="gallery-counter" class="absolute bottom-3 right-3 rounded bg-black/60 px-2 py-0.5 text-xs text-white" x-text="(current + 1) + ' / ' + images.length"></span>
                                 </div>
                             </template>
                         </div>
@@ -51,13 +51,13 @@
                         </div>
 
                         {{-- Lightbox --}}
-                        <div x-show="zoom" x-cloak x-transition.opacity class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" @click.self="zoom = false" role="dialog" aria-modal="true">
+                        <div data-testid="lightbox" x-show="zoom" x-cloak x-transition.opacity class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" @click.self="zoom = false" role="dialog" aria-modal="true">
                             <img :src="images[current].large" :alt="images[current].alt" class="max-h-full max-w-full object-contain">
-                            <button type="button" @click="zoom = false" class="absolute top-4 right-4 btn btn-circle btn-ghost text-white" aria-label="{{ __('Close') }}"><x-icon name="x-mark" class="size-6" /></button>
+                            <button type="button" data-testid="lightbox-close" @click="zoom = false" class="absolute top-4 right-4 btn btn-circle btn-ghost text-white" aria-label="{{ __('Close') }}"><x-icon name="x-mark" class="size-6" /></button>
                             <template x-if="images.length > 1">
                                 <div>
                                     <button type="button" @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost text-white" aria-label="{{ __('Previous image') }}"><x-icon name="chevron-left" class="size-6" /></button>
-                                    <button type="button" @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost text-white" aria-label="{{ __('Next image') }}"><x-icon name="chevron-right" class="size-6" /></button>
+                                    <button type="button" data-testid="lightbox-next" @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost text-white" aria-label="{{ __('Next image') }}"><x-icon name="chevron-right" class="size-6" /></button>
                                 </div>
                             </template>
                         </div>

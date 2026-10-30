@@ -1,4 +1,4 @@
-.PHONY: up down setup seed fresh test coverage pint shell build
+.PHONY: up down setup seed fresh test e2e coverage pint shell build
 
 up:
 	docker compose up -d --build
@@ -17,6 +17,9 @@ fresh:
 
 test:
 	docker compose exec app php artisan test
+
+e2e: ## browser tests (Pest Browser plugin + Playwright/Chromium inside the app container)
+	docker compose exec app composer test:e2e
 
 coverage:
 	docker compose exec app composer test:coverage

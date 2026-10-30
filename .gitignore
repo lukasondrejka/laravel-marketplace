@@ -27,3 +27,5 @@ Homestead.yaml
 Thumbs.db
 /storage/framework/phpstan
 /build
+/public/e2e-storage
+/tests/Browser/Screenshots
