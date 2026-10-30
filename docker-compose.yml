@@ -1,0 +1,46 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - .:/var/www/html
+    environment:
+      PHP_CLI_SERVER_WORKERS: 4
+      DB_HOST: db
+      DB_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+
+  node:
+    image: node:22-alpine
+    working_dir: /var/www/html
+    command: sh -c "npm install --ignore-scripts=false && npm run dev"
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: marketplace
+      MYSQL_USER: marketplace
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
+
+volumes:
+  db-data:
