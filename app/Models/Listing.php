@@ -203,8 +203,9 @@ class Listing extends Model implements HasMedia
         $words = array_slice(preg_split('/[\s,]+/u', mb_substr(trim((string) $keyword), 0, 100), -1, PREG_SPLIT_NO_EMPTY), 0, 8);
 
         foreach ($words as $word) {
-            $like = '%'.addcslashes($word, '\\%_').'%';
-            $query->where(fn ($q) => $q->where('title', 'like', $like)->orWhere('description', 'like', $like));
+            // An explicit ESCAPE character: LIKE has no default escape in SQLite, unlike MySQL.
+            $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $word).'%';
+            $query->where(fn ($q) => $q->whereRaw("title like ? escape '!'", [$like])->orWhereRaw("description like ? escape '!'", [$like]));
         }
     }
 
