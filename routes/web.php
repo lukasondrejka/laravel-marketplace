@@ -23,7 +23,7 @@ Route::livewire('/listings/{listing:slug}', ListingShow::class)->name('listings.
 
 Route::livewire('/sellers/{seller}', SellerShow::class)->name('sellers.show');
 
-Route::middleware('guest')->group(function () {
+Route::middleware(['guest', 'throttle:auth'])->group(function () {
     Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->name('social.redirect');
     Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('social.callback');
 });
