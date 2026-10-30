@@ -1,0 +1,250 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# One run per ref; a newer push cancels the superseded run.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
+env:
+  PHP_VERSION: '8.4'
+  NODE_VERSION: '22'
+  # Minimum line coverage (%) the test job must reach. Measured: ~99%.
+  COVERAGE_MIN: '95'
+
+jobs:
+  lint:
+    name: Lint (Pint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - run: composer lint
+
+  analyse:
+    name: Static analysis (Larastan)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      - run: composer analyse
+
+  assets:
+    name: Build assets (Vite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: vite-build
+          path: public/build
+          retention-days: 1
+
+  tests:
+    name: Tests (Pest, SQLite, coverage)
+    needs: assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: write # publish the JUnit report as a check run with annotations
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: gd, intl, exif, bcmath, zip, pdo_sqlite
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: vite-build
+          path: public/build
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      - name: Run tests with coverage
+        shell: bash # explicit shell enables pipefail, so a failing/under-threshold run fails despite `tee`
+        run: |
+          mkdir -p build
+          vendor/bin/pest --compact --coverage --min="$COVERAGE_MIN" \
+            --log-junit=build/junit.xml \
+            --coverage-clover=build/clover.xml \
+            --coverage-html=build/coverage \
+            2>&1 | tee build/pest.txt
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo '## Coverage'
+            echo
+            if [ -f build/clover.xml ]; then
+              python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          m = ET.parse('build/clover.xml').getroot().find('project/metrics')
+          covered, total = int(m.get('coveredstatements')), int(m.get('statements'))
+          print(f'**Line coverage: {covered / total * 100:.1f}%** ({covered}/{total} statements)')
+          PY
+            fi
+            echo
+            echo '<details><summary>Pest output and files below 100%</summary>'
+            echo
+            echo '```text'
+            sed -e 's/\x1b\[[0-9;]*m//g' build/pest.txt 2>/dev/null | sed -n '/Tests:/,$p' || true
+            echo '```'
+            echo '</details>'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish test report
+        if: always()
+        uses: mikepenz/action-junit-report@v6.6.1
+        with:
+          report_paths: build/junit.xml
+          check_name: Pest test report
+          detailed_summary: true
+          include_passed: false
+          annotate_only: false
+          fail_on_failure: false
+
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: test-results
+          path: |
+            build/junit.xml
+            build/clover.xml
+            build/coverage
+          retention-days: 14
+
+  tests-mysql:
+    name: Tests (Pest, MySQL)
+    needs: assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: marketplace_test
+          MYSQL_USER: marketplace
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: secret
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -psecret"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: marketplace_test
+      DB_USERNAME: marketplace
+      DB_PASSWORD: secret
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: gd, intl, exif, bcmath, zip, pdo_mysql
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v5.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: vite-build
+          path: public/build
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      # Same suite on the production database: also runs the accent-insensitive search tests that SQLite skips.
+      - run: vendor/bin/pest --compact
