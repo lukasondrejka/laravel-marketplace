@@ -1,0 +1,85 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call method canTransitionTo\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Listings/ChangeListingStatus.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Listings/ChangeListingStatus.php
+
+		-
+			message: '#^Property App\\Models\\Listing\:\:\$status \(string\) does not accept App\\Enums\\ListingStatus\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Actions/Listings/ChangeListingStatus.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and App\\Enums\\ListingStatus will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Actions/Listings/ChangeListingStatus.php
+
+		-
+			message: '#^Property App\\Models\\Listing\:\:\$status \(string\) does not accept App\\Enums\\ListingStatus\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Actions/Listings/CreateListing.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and App\\Enums\\ListingStatus\:\:Active will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Actions/Listings/CreateListing.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Livewire/Forms/ListingForm.php
+
+		-
+			message: '#^Call to function abort_unless\(\) with false and 404 will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: app/Livewire/Listings/ContactSeller.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and App\\Enums\\ListingStatus\:\:Active will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Livewire/Listings/ContactSeller.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Listings\\Index\:\:\$categories\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Listings/Index.php
+
+		-
+			message: '#^Cannot call method schemaUrl\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Livewire/Listings/Show.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and App\\Enums\\ListingStatus\:\:Active will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Livewire/Listings/Show.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 1
+			path: app/Policies/ListingPolicy.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between string and App\\Enums\\ListingStatus\:\:Draft will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Policies/ListingPolicy.php
