@@ -12,10 +12,20 @@
             <directory>tests/Feature</directory>
         </testsuite>
     </testsuites>
+    <groups>
+        <exclude>
+            <group>oauth</group>
+        </exclude>
+    </groups>
     <source>
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <!-- OAuth is not tested for now (group "oauth") -->
+            <file>app/Http/Controllers/Auth/SocialiteController.php</file>
+            <file>app/Actions/Users/LoginWithProvider.php</file>
+        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>

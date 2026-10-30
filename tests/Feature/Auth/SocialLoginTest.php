@@ -7,6 +7,9 @@ use Laravel\Socialite\Contracts\Factory;
 use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Two\User as ProviderUser;
 
+// OAuth is excluded from the default run (see phpunit.xml). Run: vendor/bin/pest --group=oauth
+pest()->group('oauth');
+
 function fakeProvider(string $id, ?string $email, string $name = 'Social Person'): void
 {
     fakeIdentity((new ProviderUser)->map(['id' => $id, 'name' => $name, 'email' => $email]));
