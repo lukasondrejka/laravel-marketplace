@@ -99,3 +99,71 @@ it('deletes the account only after password confirmation', function () {
         ->assertRedirect('/');
     expect(User::find($this->user->id))->toBeNull();
 });
+
+it('removes the avatar on request and replaces it on upload', function () {
+    Storage::fake('public');
+
+    Livewire::actingAs($this->user)->test(UpdateInformation::class)
+        ->set('form.avatar', UploadedFile::fake()->image('one.jpg', 200, 200))->call('save');
+    Livewire::actingAs($this->user->fresh())->test(UpdateInformation::class)
+        ->set('form.avatar', UploadedFile::fake()->image('two.jpg', 200, 200))->call('save');
+
+    expect($this->user->fresh()->getMedia('avatar'))->toHaveCount(1)
+        ->and($this->user->fresh()->avatarUrl())->not->toBeNull();
+
+    Livewire::actingAs($this->user->fresh())->test(UpdateInformation::class)->set('form.removeAvatar', true)->call('save');
+
+    expect($this->user->fresh()->getMedia('avatar'))->toHaveCount(0)->and($this->user->fresh()->avatarUrl())->toBeNull();
+});
+
+it('rejects avatars that are too large or not allowed image types', function (string $name, int $kb) {
+    Storage::fake('public');
+
+    Livewire::actingAs($this->user)->test(UpdateInformation::class)
+        ->set('form.avatar', UploadedFile::fake()->image($name)->size($kb))
+        ->call('save')
+        ->assertHasErrors('form.avatar');
+})->with([
+    'too big' => ['big.jpg', 3000],
+    'svg' => ['logo.svg', 10],
+    'gif' => ['anim.gif', 10],
+]);
+
+it('keeps verification when the email is unchanged and stores blank optional fields as null', function () {
+    Notification::fake();
+
+    Livewire::actingAs($this->user)->test(UpdateInformation::class)
+        ->set('form.phone', '')->set('form.city', '')->set('form.bio', '')
+        ->call('save')->assertHasNoErrors();
+
+    $fresh = $this->user->fresh();
+    expect($fresh->hasVerifiedEmail())->toBeTrue()->and($fresh->phone)->toBeNull()->and($fresh->city)->toBeNull()->and($fresh->bio)->toBeNull();
+    Notification::assertNothingSent();
+});
+
+it('validates profile field lengths', function (string $field, string $value) {
+    Livewire::actingAs($this->user)->test(UpdateInformation::class)
+        ->set($field, $value)->call('save')->assertHasErrors($field);
+})->with([
+    'empty name' => ['form.name', ''],
+    'long bio' => ['form.bio', str_repeat('x', 501)],
+    'long city' => ['form.city', str_repeat('x', 101)],
+    'long phone' => ['form.phone', str_repeat('1', 33)],
+    'bad email' => ['form.email', 'not-an-email'],
+]);
+
+it('requires a new password that is confirmed and long enough', function () {
+    Livewire::actingAs($this->user)->test(UpdatePassword::class)
+        ->set('current_password', 'password')->set('password', 'short')->set('password_confirmation', 'short')
+        ->call('save')->assertHasErrors('password');
+
+    Livewire::actingAs($this->user)->test(UpdatePassword::class)
+        ->set('current_password', 'password')->set('password', 'a-long-new-password')->set('password_confirmation', 'different')
+        ->call('save')->assertHasErrors('password');
+});
+
+it('keeps the account when the delete password is wrong', function () {
+    Livewire::actingAs($this->user)->test(DeleteAccount::class)->set('password', 'nope')->call('delete')->assertHasErrors('password');
+
+    expect(User::find($this->user->id))->not->toBeNull();
+});

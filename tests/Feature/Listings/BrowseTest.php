@@ -3,6 +3,7 @@
 use App\Livewire\Listings\Index;
 use App\Models\Category;
 use App\Models\Listing;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 
 it('renders the home page and the browse page', function () {
@@ -106,4 +107,52 @@ it('switches between grid and list views', function () {
     Listing::factory()->create(['title' => 'Some item']);
 
     Livewire::test(Index::class)->set('view', 'list')->assertSee('Some item')->assertSet('view', 'list');
+});
+
+it('ignores invalid filter values instead of failing', function () {
+    Listing::factory()->count(2)->create();
+
+    Livewire::test(Index::class)
+        ->set('category', 'does-not-exist')
+        ->set('condition', 'broken')
+        ->set('type', 'swap')
+        ->set('sort', 'random')
+        ->set('min', '-5')
+        ->set('max', 'abc')
+        ->assertOk();
+
+    expect(Livewire::test(Index::class)->set('category', 'nope')->get('listings')->total())->toBe(2);
+});
+
+it('resets pagination when a filter changes and clears all filters', function () {
+    Listing::factory()->count(15)->create();
+
+    $component = Livewire::test(Index::class)->call('setPage', 2)->set('q', 'zzz');
+    expect($component->get('listings')->currentPage())->toBe(1);
+
+    $component->set('min', '5')->set('sort', 'price_asc')->call('clearFilters')
+        ->assertSet('q', '')->assertSet('min', '')->assertSet('sort', 'newest');
+});
+
+it('finds ASCII case-insensitively', function () {
+    Listing::factory()->create(['title' => 'Mountain Bike']);
+
+    expect(Livewire::test(Index::class)->set('q', 'mountain BIKE')->get('listings')->total())->toBe(1);
+});
+
+it('finds Slovak words regardless of diacritics and case', function (string $query) {
+    Listing::factory()->create(['title' => 'Žltý bicykel', 'description' => 'Predám v Košiciach, odovzdanie v Žiline.']);
+    Listing::factory()->create(['title' => 'Other', 'description' => 'Nothing relevant here.']);
+
+    expect(Livewire::test(Index::class)->set('q', $query)->get('listings')->total())->toBe(1);
+})->with(['zlty', 'ŽLTÝ', 'kosiciach', 'zilin'])->group('mysql')
+    ->skip(fn () => DB::getDriverName() !== 'mysql', 'Accent-insensitive LIKE comes from the MySQL collation; run with DB_CONNECTION=mysql.');
+
+it('treats search input as data, not SQL or wildcards', function () {
+    Listing::factory()->create(['title' => '100% cotton']);
+    Listing::factory()->create(['title' => 'Plain shirt']);
+
+    expect(Livewire::test(Index::class)->set('q', "' OR 1=1 --")->get('listings')->total())->toBe(0)
+        ->and(Livewire::test(Index::class)->set('q', '%')->get('listings')->total())->toBe(1)
+        ->and(Livewire::test(Index::class)->set('q', '_')->get('listings')->total())->toBe(0);
 });
