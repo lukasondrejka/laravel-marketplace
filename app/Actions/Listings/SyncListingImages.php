@@ -14,11 +14,18 @@ class SyncListingImages
      * Each entry is either the id of an image already attached to THIS listing (kept) or an
      * uploaded file (added). Existing images that are not listed are deleted. Ids that do not
      * belong to the listing are ignored, so another user's media can never be touched.
+     * Duplicates are dropped and the list is capped at Listing::MAX_IMAGES.
      *
      * @param  array<int, int|UploadedFile>  $ordered
      */
     public function handle(Listing $listing, array $ordered): void
     {
+        $ordered = collect($ordered)
+            ->unique(fn ($item) => is_int($item) ? $item : spl_object_id($item))
+            ->take(Listing::MAX_IMAGES)
+            ->values()
+            ->all();
+
         $existing = $listing->getMedia(Listing::IMAGES)->keyBy('id');
         $keep = collect($ordered)->filter(fn ($item) => is_int($item) && $existing->has($item))->all();
 

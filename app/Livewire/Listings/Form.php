@@ -8,6 +8,7 @@ use App\Livewire\Forms\ListingForm;
 use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -62,12 +63,7 @@ class Form extends Component
     {
         $this->resetErrorBag('uploads');
 
-        $validator = Validator::make(
-            ['uploads' => $this->uploads],
-            ['uploads.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:'.config('marketplace.images.max_size_kb')]],
-            [],
-            ['uploads.*' => __('image')],
-        );
+        $validator = $this->imageValidator('uploads', $this->uploads);
 
         if ($validator->fails()) {
             $this->addError('uploads', $validator->errors()->first());
@@ -88,6 +84,19 @@ class Form extends Component
         }
 
         $this->uploads = [];
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $files
+     */
+    private function imageValidator(string $field, array $files): ValidatorContract
+    {
+        return Validator::make(
+            [$field => $files],
+            ["$field.*" => ['image', 'mimes:jpg,jpeg,png,webp', 'max:'.config('marketplace.images.max_size_kb')]],
+            [],
+            ["$field.*" => __('image')],
+        );
     }
 
     public function removeImage(string $key): void
@@ -152,6 +161,9 @@ class Form extends Component
     public function save(string $status = 'draft')
     {
         $data = $this->form->payload();
+
+        // $newImages is client-writable state, so never trust it past the upload step.
+        $this->imageValidator('newImages', $this->newImages)->validate();
 
         if ($this->listing) {
             $this->authorize('update', $this->listing);
