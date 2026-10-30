@@ -1,10 +1,10 @@
 <x-mail::message>
 # {{ __('Someone is interested in your listing') }}
 
-**{{ $senderName }}** ({{ $senderEmail }}) {{ __('wrote about') }} **{{ $listing->title }}**:
+**{{ $safeName }}** ({{ $safeEmail }}) {{ __('wrote about') }} **{{ $safeTitle }}**:
 
 <x-mail::panel>
-{{ $body }}
+{{ $safeBody }}
 </x-mail::panel>
 
 {{ __('Reply to this email to answer directly.') }}

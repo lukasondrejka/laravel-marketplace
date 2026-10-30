@@ -27,6 +27,20 @@ class ListingInquiry extends Mailable
 
     public function content(): Content
     {
-        return new Content(markdown: 'mail.listing-inquiry');
+        return new Content(markdown: 'mail.listing-inquiry', with: [
+            'safeName' => self::plain($this->senderName),
+            'safeEmail' => self::plain($this->senderEmail),
+            'safeBody' => self::plain($this->body),
+            'safeTitle' => self::plain($this->listing->title),
+        ]);
+    }
+
+    /**
+     * Backslash-escape Markdown syntax so visitor-supplied text cannot render links, images
+     * or emphasis inside the seller's email (phishing and spam vector).
+     */
+    public static function plain(string $text): string
+    {
+        return (string) preg_replace('/([\\\\`*_{}\[\]()#+\-.!|~])/', '\\\\$1', $text);
     }
 }
