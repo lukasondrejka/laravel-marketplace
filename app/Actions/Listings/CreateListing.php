@@ -19,9 +19,13 @@ class CreateListing
     public function handle(User $user, array $data, array $images = []): Listing
     {
         return DB::transaction(function () use ($user, $data, $images) {
+            $requested = ListingStatus::tryFrom((string) ($data['status'] ?? ''));
+            unset($data['status'], $data['published_at']);
+
             $listing = new Listing($data);
             $listing->user()->associate($user);
-            $listing->status = ListingStatus::tryFrom((string) ($data['status'] ?? '')) ?? ListingStatus::Draft;
+            // New listings start as a draft or go live right away; nothing else is valid on creation.
+            $listing->status = $requested === ListingStatus::Active ? ListingStatus::Active : ListingStatus::Draft;
             $listing->published_at = $listing->status === ListingStatus::Active ? now() : null;
             $listing->save();
 
